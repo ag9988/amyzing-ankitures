@@ -785,8 +785,10 @@
 
     // ===== INIT =====
     function init() {
+      console.log('APP INIT STARTING');
       restoreSessionState();
       renderItems();
+      console.log('About to call setupMenuButton');
       setupMenuButton();
       setupEventListeners();
       initFileSync();
