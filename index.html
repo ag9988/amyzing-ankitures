@@ -678,6 +678,36 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Edit Item</h2>
+        <button class="modal-close" id="close-edit">✕</button>
+      </div>
+      <form id="edit-form">
+        <div class="form-group">
+          <label>Item Name</label>
+          <input type="text" id="edit-item-name" placeholder="e.g., The Italian Place" required>
+        </div>
+        <div class="form-group">
+          <label>Date (optional)</label>
+          <input type="date" id="edit-item-date">
+        </div>
+        <div class="form-group">
+          <label>Time (optional)</label>
+          <input type="time" id="edit-item-time">
+        </div>
+        <div class="form-group">
+          <label>Notes (optional)</label>
+          <textarea id="edit-item-notes" placeholder="e.g., Good pasta, try on Saturday"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-save">Save Changes</button>
+          <button type="button" class="btn-cancel" id="cancel-edit">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <input type="file" id="import-file" accept=".json" style="display:none;">
 
@@ -929,6 +959,7 @@
           </div>
           <div class="item-actions">
             ${item.date ? `<button class="item-action-btn" onclick="downloadIcal('${item.id}')" title="Download to Calendar">📅</button>` : ''}
+            <button class="item-action-btn" onclick="openEditItem('${item.id}')" title="Edit">✎</button>
             <button class="item-delete" onclick="deleteItem('${item.id}')">✕</button>
           </div>
         </div>
@@ -1019,6 +1050,49 @@ END:VCALENDAR`;
       items = items.filter(i => i.id !== id);
       saveData(items);
       renderItems();
+    }
+
+    let editingItemId = null;
+
+    function openEditItem(id) {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+
+      editingItemId = id;
+      document.getElementById('edit-item-name').value = item.name;
+      document.getElementById('edit-item-date').value = item.date || '';
+      document.getElementById('edit-item-time').value = item.time || '';
+      document.getElementById('edit-item-notes').value = item.notes || '';
+      document.getElementById('edit-modal').classList.add('active');
+      document.getElementById('edit-item-name').focus();
+    }
+
+    function saveEditItem() {
+      if (!editingItemId) return;
+
+      const item = items.find(i => i.id === editingItemId);
+      if (!item) return;
+
+      const name = document.getElementById('edit-item-name').value.trim();
+      const date = document.getElementById('edit-item-date').value;
+      const time = document.getElementById('edit-item-time').value;
+      const notes = document.getElementById('edit-item-notes').value.trim();
+
+      if (!name) {
+        alert('Item name is required');
+        return;
+      }
+
+      item.name = name;
+      item.date = date || null;
+      item.time = time || null;
+      item.notes = notes || null;
+      item.timestamp = Date.now();
+
+      saveData(items);
+      renderItems();
+      document.getElementById('edit-modal').classList.remove('active');
+      editingItemId = null;
     }
 
     function exportData() {
@@ -1240,6 +1314,30 @@ END:VCALENDAR`;
           addItem(name, notes, date, time);
           document.getElementById('add-form').reset();
           document.getElementById('add-modal').classList.remove('active');
+        }
+      });
+
+      // Edit modal listeners
+      document.getElementById('close-edit').addEventListener('click', () => {
+        document.getElementById('edit-modal').classList.remove('active');
+        editingItemId = null;
+      });
+
+      document.getElementById('cancel-edit').addEventListener('click', () => {
+        document.getElementById('edit-modal').classList.remove('active');
+        editingItemId = null;
+      });
+
+      document.getElementById('edit-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveEditItem();
+      });
+
+      // Modal overlay click
+      document.getElementById('edit-modal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('edit-modal')) {
+          document.getElementById('edit-modal').classList.remove('active');
+          editingItemId = null;
         }
       });
 
