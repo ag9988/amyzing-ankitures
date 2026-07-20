@@ -877,6 +877,13 @@
     }
 
     async function setupNewFileSync() {
+      // Check if File System Access API is supported
+      if (!window.showSaveFilePicker) {
+        alert('iCloud Sync is not supported on iOS Safari. Please use Mac Safari, Chrome, or Edge.');
+        updateSyncUI('unsupported');
+        return;
+      }
+
       try {
         const handle = await showSaveFilePicker({
           suggestedName: 'shared-list.json',
