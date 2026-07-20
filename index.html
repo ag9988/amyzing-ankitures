@@ -877,6 +877,14 @@
     }
 
     async function setupNewFileSync() {
+      // Check if running on iOS
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+      if (isIOS) {
+        alert('iCloud Sync is not available on iOS.\n\nAlternative: Use the Export feature to save your data as JSON, then upload it to iCloud Drive using the Files app.');
+        return;
+      }
+
       try {
         const handle = await showSaveFilePicker({
           suggestedName: 'shared-list.json',
@@ -901,7 +909,7 @@
         }
         if (err.name !== 'AbortError') {
           console.error('Sync error:', err);
-          alert(`Sync not available: ${err.message || err.name}`);
+          alert(`Sync error: ${err.message || err.name}`);
         }
       }
     }
