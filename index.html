@@ -1324,8 +1324,10 @@ END:VCALENDAR`;
       const menuModal = document.getElementById('menu-modal');
       const menuDropdown = document.getElementById('menu-dropdown');
 
+      console.log('setupEventListeners Menu: menuBtn=', !!menuBtn, 'menuDropdown=', !!menuDropdown);
       if (menuBtn && menuDropdown) {
         menuBtn.addEventListener('click', (e) => {
+          console.log('addEventListener: Menu button clicked!');
           e.stopPropagation();
           menuDropdown.classList.toggle('active');
         });
