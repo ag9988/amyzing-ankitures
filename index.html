@@ -708,7 +708,7 @@
         </div>
         <div class="form-group">
           <label>Date (optional)</label>
-          <input type="date" id="item-date" readonly>
+          <input type="date" id="item-date">
         </div>
         <div class="form-group">
           <label>Time (optional)</label>
@@ -781,7 +781,6 @@
       restoreSessionState();
       renderItems();
       setupEventListeners();
-      initCalendarPicker();
       initFileSync();
       generateAppIcon();
       setupOrientationListener();
@@ -1255,15 +1254,18 @@ END:VCALENDAR`;
       const menuModal = document.getElementById('menu-modal');
       const menuDropdown = document.getElementById('menu-dropdown');
 
-      menuBtn.addEventListener('click', () => {
-        menuDropdown.classList.toggle('active');
-      });
+      if (menuBtn && menuDropdown) {
+        menuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          menuDropdown.classList.toggle('active');
+        });
 
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('#menu-btn') && !e.target.closest('.menu-dropdown')) {
-          menuDropdown.classList.remove('active');
-        }
-      });
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('#menu-btn') && !e.target.closest('.menu-dropdown')) {
+            menuDropdown.classList.remove('active');
+          }
+        });
+      }
 
       // Menu items
       document.getElementById('export-btn').addEventListener('click', () => {
