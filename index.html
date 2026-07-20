@@ -426,55 +426,6 @@
       background: var(--surface3);
     }
 
-    /* Menu dropdown */
-    .menu-dropdown {
-      position: fixed;
-      top: 50px;
-      right: 16px;
-      background: var(--surface);
-      border-radius: 12px;
-      border: 1px solid var(--sep);
-      min-width: 200px;
-      display: block;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 999;
-      overflow: hidden;
-      transition: opacity 0.2s;
-      visibility: hidden;
-    }
-
-    .menu-dropdown.active {
-      opacity: 1;
-      pointer-events: auto;
-      visibility: visible;
-    }
-
-    .menu-item {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--sep);
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text);
-      text-align: left;
-      font-size: 15px;
-      transition: background 0.2s;
-      width: 100%;
-    }
-
-    .menu-item:last-child {
-      border-bottom: none;
-    }
-
-    .menu-item:active {
-      background: var(--surface2);
-    }
-
-    .menu-item.destructive {
-      color: var(--red);
-    }
-
     /* Sync status */
     .sync-status {
       padding: 8px 12px;
@@ -674,11 +625,7 @@
         <h1>Amyzing Ankitures</h1>
       </div>
       <div class="header-actions">
-        <button class="btn-icon" id="menu-btn" title="Menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
-          </svg>
-        </button>
+        <button class="btn-icon" id="sync-btn-header" title="iCloud Sync">☁️</button>
       </div>
     </div>
 
@@ -731,16 +678,6 @@
     </div>
   </div>
 
-  <div class="menu-dropdown" id="menu-dropdown">
-    <button class="menu-item" id="export-btn">📤 Export Data</button>
-    <button class="menu-item" id="export-ical-btn">📅 Export iCal (All Events)</button>
-    <button class="menu-item" id="import-btn">📥 Import Data</button>
-    <button class="menu-item" id="sync-btn">☁️ iCloud Sync</button>
-    <button class="menu-item destructive" id="clear-btn">🗑️ Clear All</button>
-  </div>
-
-  <div class="modal-overlay" id="menu-modal">
-  </div>
 
   <input type="file" id="import-file" accept=".json" style="display:none;">
 
@@ -796,14 +733,7 @@
     }
 
     function setupMenuButton() {
-      const menuBtn = document.getElementById('menu-btn');
-      const menuDropdown = document.getElementById('menu-dropdown');
-      if (menuBtn && menuDropdown) {
-        menuBtn.onclick = (e) => {
-          e.stopPropagation();
-          menuDropdown.classList.toggle('active');
-        };
-      }
+      // Removed - menu button replaced with dedicated sync button
     }
 
     // ===== PERSISTENCE =====
@@ -1313,62 +1243,21 @@ END:VCALENDAR`;
         }
       });
 
-      // Menu
-      const menuBtn = document.getElementById('menu-btn');
-      const menuModal = document.getElementById('menu-modal');
-      const menuDropdown = document.getElementById('menu-dropdown');
-
-      if (menuBtn && menuDropdown) {
-        menuBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          menuDropdown.classList.toggle('active');
-        });
-
-        document.addEventListener('click', (e) => {
-          if (!e.target.closest('#menu-btn') && !e.target.closest('.menu-dropdown')) {
-            menuDropdown.classList.remove('active');
-          }
+      // iCloud Sync button in header
+      const syncBtnHeader = document.getElementById('sync-btn-header');
+      if (syncBtnHeader) {
+        syncBtnHeader.addEventListener('click', () => {
+          setupNewFileSync();
         });
       }
 
-      // Menu items
-      document.getElementById('export-btn').addEventListener('click', () => {
-        exportData();
-        menuDropdown.classList.remove('active');
-      });
-
-      document.getElementById('export-ical-btn').addEventListener('click', () => {
-        exportAllIcal();
-        menuDropdown.classList.remove('active');
-      });
-
-      document.getElementById('import-btn').addEventListener('click', () => {
-        document.getElementById('import-file').click();
-        menuDropdown.classList.remove('active');
-      });
-
+      // Import file
       document.getElementById('import-file').addEventListener('change', importData);
-
-      document.getElementById('sync-btn').addEventListener('click', () => {
-        setupNewFileSync();
-        menuDropdown.classList.remove('active');
-      });
-
-      document.getElementById('clear-btn').addEventListener('click', () => {
-        clearAll();
-        menuDropdown.classList.remove('active');
-      });
 
       // Modal overlay click
       document.getElementById('add-modal').addEventListener('click', (e) => {
         if (e.target === document.getElementById('add-modal')) {
           document.getElementById('add-modal').classList.remove('active');
-        }
-      });
-
-      document.getElementById('menu-modal').addEventListener('click', (e) => {
-        if (e.target === document.getElementById('menu-modal')) {
-          menuDropdown.classList.remove('active');
         }
       });
     }
