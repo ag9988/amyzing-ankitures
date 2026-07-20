@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amyzing Ankitures</title>
+
+  <!-- iOS meta tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Amyzing Ankitures">
+  <link rel="apple-touch-icon" id="app-icon">
+
+  <style>
+    :root {
+      --bg: #0a0e27;
+      --surface: #1a1a3e;
+      --surface2: #2d1b4e;
+      --surface3: #3d2b5e;
+      --sep: rgba(255,107,211,0.2);
+      --accent: #ff006e;
+      --accent2: #9d4edd;
+      --accent3: #ff6b35;
+      --cyan: #00d9ff;
+      --text: #ebebf5;
+      --text2: rgba(235,235,245,0.6);
+      --text3: rgba(235,235,245,0.3);
+      --green: #32d74b;
+      --blue: #00d9ff;
+      --red: #ff453a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* Header */
+    .header {
+      padding: 16px;
+      border-bottom: 1px solid var(--sep);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-left {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex: 1;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--surface2);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      transition: background 0.2s;
+    }
+
+    .btn-icon:active {
+      background: var(--surface3);
+    }
+
+    /* Category pills */
+    .category-pills {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .category-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .pill {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: none;
+      background: var(--surface2);
+      color: var(--text2);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+
+    .pill.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    /* Main content */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .item {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      border: 1px solid var(--sep);
+      transition: all 0.2s;
+    }
+
+    .item.done {
+      opacity: 0.5;
+    }
+
+    .item.done .item-text {
+      text-decoration: line-through;
+      color: var(--text3);
+    }
+
+    .item-checkbox {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 2px solid var(--sep);
+      background: transparent;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.2s;
+      appearance: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .item-checkbox:checked {
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .item-checkbox:checked::after {
+      content: '✓';
+      color: var(--bg);
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .item-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .item-text {
+      font-size: 16px;
+      word-break: break-word;
+      margin-bottom: 4px;
+    }
+
+    .item-date {
+      font-size: 12px;
+      color: var(--cyan);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .item-note {
+      font-size: 13px;
+      color: var(--text3);
+      margin-bottom: 6px;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .item-action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--surface2);
+      border: none;
+      cursor: pointer;
+      color: var(--cyan);
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+
+    .item-action-btn:active {
+      background: var(--surface3);
+    }
+
+    .item-delete {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--surface2);
+      border: none;
+      cursor: pointer;
+      color: var(--red);
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .item-delete:active {
+      background: var(--surface3);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text3);
+    }
+
+    .empty-state p {
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    /* Footer / Add button */
+    .footer {
+      padding: 12px 16px 16px;
+      border-top: 1px solid var(--sep);
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:active {
+      background: #ff1744;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: flex-end;
+      z-index: 1000;
+      animation: fadeIn 0.2s;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 16px 16px 0 0;
+      padding: 20px 16px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--sep);
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--surface2);
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--sep);
+      color: var(--text);
+      font-size: 16px;
+      font-family: inherit;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .form-actions button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-save {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-save:active {
+      background: #ff1744;
+    }
+
+    .btn-cancel {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .btn-cancel:active {
+      background: var(--surface3);
+    }
+
+    /* Menu dropdown */
+    .menu-dropdown {
+      position: fixed;
+      top: 50px;
+      right: 16px;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--sep);
+      min-width: 200px;
+      display: none;
+      z-index: 999;
+      overflow: hidden;
+      animation: fadeIn 0.2s;
+    }
+
+    .menu-dropdown.active {
+      display: block;
+    }
+
+    .menu-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--sep);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+      text-align: left;
+      font-size: 15px;
+      transition: background 0.2s;
+      width: 100%;
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .menu-item:active {
+      background: var(--surface2);
+    }
+
+    .menu-item.destructive {
+      color: var(--red);
+    }
+
+    /* Sync status */
+    .sync-status {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--text3);
+      background: var(--surface2);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .sync-status.connected {
+      background: rgba(50, 215, 75, 0.1);
+      color: var(--green);
+    }
+
+    .sync-status.syncing {
+      background: rgba(10, 132, 255, 0.1);
+      color: var(--blue);
+    }
+
+    /* Rotate message for landscape */
+    .rotate-msg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #000;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    @media screen and (orientation: landscape) and (max-width: 1024px) {
+      .rotate-msg {
+        display: flex;
+      }
+    }
+
+    .rotate-icon {
+      font-size: 60px;
+      animation: tilt 1s ease-in-out infinite;
+    }
+
+    @keyframes tilt {
+      0%, 100% { transform: rotate(-20deg); }
+      50% { transform: rotate(20deg); }
+    }
+
+    .rotate-text {
+      color: var(--text2);
+      font-size: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .header h1 {
+        font-size: 20px;
+      }
+
+      .btn-icon {
+        width: 36px;
+        height: 36px;
+      }
+    }
+
+    /* Calendar Picker */
+    .calendar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .calendar-overlay.active {
+      display: flex;
+    }
+
+    .calendar-picker {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid var(--sep);
+      min-width: 320px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+
+    .calendar-header button {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--surface2);
+      border: none;
+      cursor: pointer;
+      color: var(--cyan);
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+
+    .calendar-header button:active {
+      background: var(--surface3);
+    }
+
+    .calendar-month-year {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      min-width: 140px;
+      text-align: center;
+    }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .calendar-weekday {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--cyan);
+      padding: 8px 0;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--sep);
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+
+    .calendar-day:active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .calendar-day.other-month {
+      color: var(--text3);
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .calendar-day.other-month:active {
+      background: var(--surface2);
+      color: var(--text3);
+    }
+
+    .calendar-day.today {
+      background: var(--accent2);
+      color: white;
+      border-color: var(--accent2);
+    }
+  </style>
+</head>
+<body>
+  <div class="rotate-msg">
+    <div class="rotate-icon">📱</div>
+    <div class="rotate-text">Please rotate to portrait</div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <div class="header-left">
+        <h1>Amyzing Ankitures</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn-icon" id="menu-btn" title="Menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="sync-status" class="sync-status" style="display:none;"></div>
+
+    <div class="category-pills">
+      <button class="pill active" data-category="restaurants">🍽️ Restaurants</button>
+      <button class="pill" data-category="hikes">🥾 Hikes</button>
+      <button class="pill" data-category="things">🏛️ Things to Do</button>
+      <button class="pill" data-category="events">🎭 Events</button>
+    </div>
+
+    <div class="content">
+      <div class="items-list" id="items-list"></div>
+    </div>
+
+    <div class="footer">
+      <button class="btn-primary" id="add-btn">+ Add Item</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="add-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Add Item</h2>
+        <button class="modal-close" id="close-add">✕</button>
+      </div>
+      <form id="add-form">
+        <div class="form-group">
+          <label>Item Name</label>
+          <input type="text" id="item-name" placeholder="e.g., The Italian Place" required>
+        </div>
+        <div class="form-group">
+          <label>Date (optional)</label>
+          <input type="date" id="item-date" readonly>
+        </div>
+        <div class="form-group">
+          <label>Time (optional)</label>
+          <input type="time" id="item-time">
+        </div>
+        <div class="form-group">
+          <label>Notes (optional)</label>
+          <textarea id="item-notes" placeholder="e.g., Good pasta, try on Saturday"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-save">Save</button>
+          <button type="button" class="btn-cancel" id="cancel-add">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="menu-modal">
+    <div class="menu-dropdown" id="menu-dropdown">
+      <button class="menu-item" id="export-btn">📤 Export Data</button>
+      <button class="menu-item" id="import-btn">📥 Import Data</button>
+      <button class="menu-item" id="sync-btn">☁️ iCloud Sync</button>
+      <button class="menu-item destructive" id="clear-btn">🗑️ Clear All</button>
+    </div>
+  </div>
+
+  <input type="file" id="import-file" accept=".json" style="display:none;">
+
+  <div class="calendar-overlay" id="calendar-overlay">
+    <div class="calendar-picker">
+      <div class="calendar-header">
+        <button id="calendar-prev">‹</button>
+        <div class="calendar-month-year" id="calendar-month-year"></div>
+        <button id="calendar-next">›</button>
+      </div>
+      <div class="calendar-weekdays">
+        <div class="calendar-weekday">Su</div>
+        <div class="calendar-weekday">Mo</div>
+        <div class="calendar-weekday">Tu</div>
+        <div class="calendar-weekday">We</div>
+        <div class="calendar-weekday">Th</div>
+        <div class="calendar-weekday">Fr</div>
+        <div class="calendar-weekday">Sa</div>
+      </div>
+      <div class="calendar-grid" id="calendar-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    // ===== DATA LAYER =====
+    const CATEGORIES = {
+      restaurants: '🍽️ Restaurants',
+      hikes: '🥾 Hikes',
+      things: '🏛️ Things to Do',
+      events: '🎭 Events',
+    };
+
+    // ===== STATE =====
+    let selectedCategory = 'restaurants';
+    let items = [];
+    let fileHandle = null;
+    let _pendingHandle = null;
+    let _wasLandscape = window.innerWidth > window.innerHeight;
+    let _calendarMonth = new Date().getMonth();
+    let _calendarYear = new Date().getFullYear();
+    let _calendarInput = null;
+
+    // ===== INIT =====
+    function init() {
+      restoreSessionState();
+      renderItems();
+      setupEventListeners();
+      initCalendarPicker();
+      initFileSync();
+      generateAppIcon();
+      setupOrientationListener();
+      updateSyncUI('checking');
+    }
+
+    // ===== PERSISTENCE =====
+    function saveData(data) {
+      localStorage.setItem('shared-list-data', JSON.stringify(data));
+      if (fileHandle) {
+        syncToFile(data);
+      }
+    }
+
+    function loadData() {
+      const saved = localStorage.getItem('shared-list-data');
+      return saved ? JSON.parse(saved) : [];
+    }
+
+    function restoreSessionState() {
+      const sessionState = sessionStorage.getItem('shared-list-session');
+      if (sessionState) {
+        try {
+          const state = JSON.parse(sessionState);
+          selectedCategory = state.selectedCategory;
+          sessionStorage.removeItem('shared-list-session');
+        } catch (e) {
+          console.error('Failed to restore session:', e);
+        }
+      }
+      items = loadData();
+    }
+
+    function saveSessionState() {
+      sessionStorage.setItem('shared-list-session', JSON.stringify({
+        selectedCategory,
+      }));
+    }
+
+    // ===== FILE SYNC =====
+    async function initFileSync() {
+      try {
+        const dbRequest = indexedDB.open('shared-list-sync', 1);
+        dbRequest.onupgradeneeded = (e) => {
+          e.target.result.createObjectStore('store');
+        };
+        dbRequest.onsuccess = async (e) => {
+          const db = e.target.result;
+          const tx = db.transaction('store', 'readonly');
+          const req = tx.objectStore('store').get('fh');
+          req.onsuccess = async () => {
+            _pendingHandle = req.result;
+            if (_pendingHandle) {
+              try {
+                const perm = await _pendingHandle.queryPermission({ mode: 'readwrite' });
+                if (perm === 'granted') {
+                  fileHandle = _pendingHandle;
+                  const fileData = await _pendingHandle.getFile();
+                  const text = await fileData.text();
+                  const fileItems = JSON.parse(text);
+                  items = mergeHistories(items, fileItems);
+                  saveData(items);
+                  updateSyncUI('connected');
+                } else {
+                  updateSyncUI('reconnect');
+                }
+              } catch (err) {
+                console.error('File sync error:', err);
+                updateSyncUI('unsupported');
+              }
+            } else {
+              updateSyncUI('unsupported');
+            }
+            renderItems();
+          };
+        };
+      } catch (err) {
+        console.error('IndexedDB error:', err);
+        updateSyncUI('unsupported');
+      }
+    }
+
+    async function reconnectSync() {
+      if (!_pendingHandle) return;
+      try {
+        const perm = await _pendingHandle.requestPermission({ mode: 'readwrite' });
+        if (perm === 'granted') {
+          fileHandle = _pendingHandle;
+          const fileData = await _pendingHandle.getFile();
+          const text = await fileData.text();
+          const fileItems = JSON.parse(text);
+          items = mergeHistories(items, fileItems);
+          saveData(items);
+          updateSyncUI('connected');
+          renderItems();
+        }
+      } catch (err) {
+        console.error('Reconnect error:', err);
+      }
+    }
+
+    async function syncToFile(data) {
+      if (!fileHandle) return;
+      try {
+        const writable = await fileHandle.createWritable();
+        await writable.write(JSON.stringify(data, null, 2));
+        await writable.close();
+        updateSyncUI('connected');
+      } catch (err) {
+        console.error('Sync error:', err);
+        if (err.name === 'NotAllowedError') {
+          updateSyncUI('reconnect');
+        }
+      }
+    }
+
+    async function setupNewFileSync() {
+      try {
+        const handle = await showSaveFilePicker({
+          suggestedName: 'shared-list.json',
+          types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+        });
+        fileHandle = handle;
+
+        // Save to IndexedDB
+        const dbRequest = indexedDB.open('shared-list-sync', 1);
+        dbRequest.onsuccess = (e) => {
+          const db = e.target.result;
+          const tx = db.transaction('store', 'readwrite');
+          tx.objectStore('store').put(handle, 'fh');
+        };
+
+        await syncToFile(items);
+        updateSyncUI('connected');
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error('Setup sync error:', err);
+        }
+      }
+    }
+
+    function mergeHistories(local, imported) {
+      const map = new Map();
+      [...local, ...imported].forEach(item => {
+        if (!map.has(item.id) || item.timestamp > map.get(item.id).timestamp) {
+          map.set(item.id, item);
+        }
+      });
+      return Array.from(map.values()).sort((a, b) => b.timestamp - a.timestamp);
+    }
+
+    function updateSyncUI(status) {
+      const el = document.getElementById('sync-status');
+      if (status === 'connected') {
+        el.textContent = '✓ iCloud Sync Connected';
+        el.className = 'sync-status connected';
+        el.style.display = 'block';
+      } else if (status === 'reconnect') {
+        el.textContent = '⚠ Reconnect iCloud Sync';
+        el.className = 'sync-status';
+        el.style.display = 'block';
+        el.style.cursor = 'pointer';
+        el.onclick = reconnectSync;
+      } else if (status === 'syncing') {
+        el.textContent = '⟳ Syncing...';
+        el.className = 'sync-status syncing';
+        el.style.display = 'block';
+      } else if (status === 'checking') {
+        el.style.display = 'none';
+      } else {
+        el.style.display = 'none';
+      }
+    }
+
+    // ===== RENDER =====
+    function renderItems() {
+      const list = document.getElementById('items-list');
+      const categoryItems = items.filter(item => item.category === selectedCategory);
+
+      if (categoryItems.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <p>No items yet</p>
+            <p style="font-size: 12px;">Tap "Add Item" to get started</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = categoryItems.map(item => `
+        <div class="item ${item.done ? 'done' : ''}">
+          <input type="checkbox" class="item-checkbox" ${item.done ? 'checked' : ''} onchange="toggleItem('${item.id}')">
+          <div class="item-content">
+            <div class="item-text">${escapeHtml(item.name)}</div>
+            ${item.date ? `<div class="item-date">📅 ${formatDate(item.date)}${item.time ? ` at ${item.time}` : ''}</div>` : ''}
+            ${item.notes ? `<div class="item-note">${escapeHtml(item.notes)}</div>` : ''}
+          </div>
+          <div class="item-actions">
+            ${item.date ? `<button class="item-action-btn" onclick="downloadIcal('${item.id}')" title="Download to Calendar">📅</button>` : ''}
+            <button class="item-delete" onclick="deleteItem('${item.id}')">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ===== ACTIONS =====
+    function addItem(name, notes, date, time) {
+      const item = {
+        id: Date.now().toString(),
+        category: selectedCategory,
+        name,
+        notes,
+        date,
+        time,
+        done: false,
+        timestamp: Date.now(),
+      };
+      items.push(item);
+      saveData(items);
+      renderItems();
+    }
+
+    function formatDate(dateStr) {
+      try {
+        const date = new Date(dateStr + 'T00:00:00');
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      } catch (e) {
+        return dateStr;
+      }
+    }
+
+    function downloadIcal(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item || !item.date) return;
+
+      const uid = `amyzing-${item.id}@ankitures.local`;
+      const dtstart = item.date.replace(/-/g, '');
+      const dtend = item.date.replace(/-/g, '');
+
+      let description = item.notes || '';
+      if (item.category) {
+        description = (description ? description + ' | ' : '') + `Category: ${item.category}`;
+      }
+
+      let icalContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Amyzing Ankitures//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+DTSTART:${dtstart}${item.time ? 'T' + item.time.replace(':', '') + '00' : ''}
+SUMMARY:${item.name}
+DESCRIPTION:${description}
+LOCATION:Amyzing Ankitures
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR`;
+
+      const blob = new Blob([icalContent], { type: 'text/calendar' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${item.name.replace(/\s+/g, '-')}.ics`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function toggleItem(id) {
+      const item = items.find(i => i.id === id);
+      if (item) {
+        item.done = !item.done;
+        item.timestamp = Date.now();
+        saveData(items);
+        renderItems();
+      }
+    }
+
+    function deleteItem(id) {
+      items = items.filter(i => i.id !== id);
+      saveData(items);
+      renderItems();
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'shared-list.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          items = mergeHistories(items, imported);
+          saveData(items);
+          renderItems();
+        } catch (err) {
+          alert('Failed to import file');
+          console.error(err);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function clearAll() {
+      if (confirm('Delete all items? This cannot be undone.')) {
+        items = [];
+        saveData(items);
+        renderItems();
+      }
+    }
+
+    // ===== CALENDAR PICKER =====
+    function initCalendarPicker() {
+      const dateInput = document.getElementById('item-date');
+      dateInput.addEventListener('click', () => {
+        _calendarInput = dateInput;
+        openCalendar();
+      });
+
+      document.getElementById('calendar-prev').addEventListener('click', () => {
+        _calendarMonth--;
+        if (_calendarMonth < 0) {
+          _calendarMonth = 11;
+          _calendarYear--;
+        }
+        renderCalendarDays();
+      });
+
+      document.getElementById('calendar-next').addEventListener('click', () => {
+        _calendarMonth++;
+        if (_calendarMonth > 11) {
+          _calendarMonth = 0;
+          _calendarYear++;
+        }
+        renderCalendarDays();
+      });
+
+      document.getElementById('calendar-overlay').addEventListener('click', (e) => {
+        if (e.target.id === 'calendar-overlay') {
+          closeCalendar();
+        }
+      });
+    }
+
+    function openCalendar() {
+      if (_calendarInput.value) {
+        const [year, month, day] = _calendarInput.value.split('-');
+        _calendarYear = parseInt(year);
+        _calendarMonth = parseInt(month) - 1;
+      } else {
+        _calendarMonth = new Date().getMonth();
+        _calendarYear = new Date().getFullYear();
+      }
+      document.getElementById('calendar-overlay').classList.add('active');
+      renderCalendarDays();
+    }
+
+    function closeCalendar() {
+      document.getElementById('calendar-overlay').classList.remove('active');
+    }
+
+    function renderCalendarDays() {
+      const monthYear = document.getElementById('calendar-month-year');
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'];
+      monthYear.textContent = `${monthNames[_calendarMonth]} ${_calendarYear}`;
+
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
+
+      const firstDay = new Date(_calendarYear, _calendarMonth, 1);
+      const lastDay = new Date(_calendarYear, _calendarMonth + 1, 0);
+      const prevLastDay = new Date(_calendarYear, _calendarMonth, 0);
+
+      const firstDayOfWeek = firstDay.getDay();
+      const lastDateOfMonth = lastDay.getDate();
+      const lastDateOfPrevMonth = prevLastDay.getDate();
+
+      let date = 1;
+      const today = new Date();
+      const isCurrentMonth = today.getMonth() === _calendarMonth && today.getFullYear() === _calendarYear;
+
+      for (let x = 0; x < 6; x++) {
+        for (let y = 0; y < 7; y++) {
+          const cell = document.createElement('div');
+          cell.classList.add('calendar-day');
+
+          if (x === 0 && y < firstDayOfWeek) {
+            cell.textContent = lastDateOfPrevMonth - firstDayOfWeek + y + 1;
+            cell.classList.add('other-month');
+          } else if (date > lastDateOfMonth) {
+            cell.textContent = date - lastDateOfMonth;
+            cell.classList.add('other-month');
+            date++;
+          } else {
+            cell.textContent = date;
+            if (isCurrentMonth && date === today.getDate()) {
+              cell.classList.add('today');
+            }
+            cell.addEventListener('click', () => selectDate(_calendarYear, _calendarMonth + 1, date));
+            date++;
+          }
+          grid.appendChild(cell);
+        }
+      }
+    }
+
+    function selectDate(year, month, day) {
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      _calendarInput.value = dateStr;
+      closeCalendar();
+    }
+
+    // ===== UI EVENT LISTENERS =====
+    function setupEventListeners() {
+      // Category pills
+      document.querySelectorAll('.pill').forEach(pill => {
+        pill.addEventListener('click', (e) => {
+          document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+          e.target.classList.add('active');
+          selectedCategory = e.target.dataset.category;
+          renderItems();
+        });
+      });
+
+      // Add item modal
+      document.getElementById('add-btn').addEventListener('click', () => {
+        document.getElementById('add-modal').classList.add('active');
+        document.getElementById('item-name').focus();
+      });
+
+      document.getElementById('close-add').addEventListener('click', () => {
+        document.getElementById('add-modal').classList.remove('active');
+      });
+
+      document.getElementById('cancel-add').addEventListener('click', () => {
+        document.getElementById('add-modal').classList.remove('active');
+      });
+
+      document.getElementById('add-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('item-name').value.trim();
+        const notes = document.getElementById('item-notes').value.trim();
+        const date = document.getElementById('item-date').value;
+        const time = document.getElementById('item-time').value;
+        if (name) {
+          addItem(name, notes, date, time);
+          document.getElementById('add-form').reset();
+          document.getElementById('add-modal').classList.remove('active');
+        }
+      });
+
+      // Menu
+      const menuBtn = document.getElementById('menu-btn');
+      const menuModal = document.getElementById('menu-modal');
+      const menuDropdown = document.getElementById('menu-dropdown');
+
+      menuBtn.addEventListener('click', () => {
+        menuDropdown.classList.toggle('active');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#menu-btn') && !e.target.closest('.menu-dropdown')) {
+          menuDropdown.classList.remove('active');
+        }
+      });
+
+      // Menu items
+      document.getElementById('export-btn').addEventListener('click', () => {
+        exportData();
+        menuDropdown.classList.remove('active');
+      });
+
+      document.getElementById('import-btn').addEventListener('click', () => {
+        document.getElementById('import-file').click();
+        menuDropdown.classList.remove('active');
+      });
+
+      document.getElementById('import-file').addEventListener('change', importData);
+
+      document.getElementById('sync-btn').addEventListener('click', () => {
+        setupNewFileSync();
+        menuDropdown.classList.remove('active');
+      });
+
+      document.getElementById('clear-btn').addEventListener('click', () => {
+        clearAll();
+        menuDropdown.classList.remove('active');
+      });
+
+      // Modal overlay click
+      document.getElementById('add-modal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('add-modal')) {
+          document.getElementById('add-modal').classList.remove('active');
+        }
+      });
+
+      document.getElementById('menu-modal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('menu-modal')) {
+          menuDropdown.classList.remove('active');
+        }
+      });
+    }
+
+    // ===== ORIENTATION =====
+    function setupOrientationListener() {
+      window.addEventListener('resize', () => {
+        const isLandscape = window.innerWidth > window.innerHeight;
+        if (isLandscape && !_wasLandscape) {
+          _wasLandscape = true;
+          saveSessionState();
+        } else if (!isLandscape && _wasLandscape) {
+          _wasLandscape = false;
+          location.reload();
+        }
+      });
+    }
+
+    // ===== APP ICON =====
+    function generateAppIcon() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 180;
+      canvas.height = 180;
+      const ctx = canvas.getContext('2d');
+
+      // Dark purple background
+      ctx.fillStyle = '#0a0e27';
+      ctx.fillRect(0, 0, 180, 180);
+
+      // Hot pink and cyan glow
+      const gradient1 = ctx.createRadialGradient(45, 45, 0, 90, 90, 140);
+      gradient1.addColorStop(0, 'rgba(255, 0, 110, 0.3)');
+      gradient1.addColorStop(0.5, 'rgba(157, 78, 221, 0.2)');
+      gradient1.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = gradient1;
+      ctx.fillRect(0, 0, 180, 180);
+
+      const gradient2 = ctx.createRadialGradient(135, 135, 0, 90, 90, 140);
+      gradient2.addColorStop(0, 'rgba(0, 217, 255, 0.25)');
+      gradient2.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = gradient2;
+      ctx.fillRect(0, 0, 180, 180);
+
+      // Main text
+      ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont';
+      ctx.fillStyle = '#ff006e';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('AMYZING', 90, 65);
+
+      ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont';
+      ctx.fillStyle = '#00d9ff';
+      ctx.fillText('ANKITURES', 90, 105);
+
+      const link = document.getElementById('app-icon');
+      link.href = canvas.toDataURL();
+    }
+
+    // ===== START =====
+    init();
+  </script>
+</body>
+</html>
