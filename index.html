@@ -877,13 +877,6 @@
     }
 
     async function setupNewFileSync() {
-      // Check if File System Access API is supported
-      if (!window.showSaveFilePicker) {
-        alert('iCloud Sync is not supported on iOS Safari. Please use Mac Safari, Chrome, or Edge.');
-        updateSyncUI('unsupported');
-        return;
-      }
-
       try {
         const handle = await showSaveFilePicker({
           suggestedName: 'shared-list.json',
@@ -902,8 +895,13 @@
         await syncToFile(items);
         updateSyncUI('connected');
       } catch (err) {
+        if (err.name === 'NotAllowedError') {
+          // User cancelled or no permission
+          return;
+        }
         if (err.name !== 'AbortError') {
-          console.error('Setup sync error:', err);
+          console.error('Sync error:', err);
+          alert(`Sync not available: ${err.message || err.name}`);
         }
       }
     }
