@@ -790,7 +790,9 @@
       renderItems();
       console.log('About to call setupMenuButton');
       setupMenuButton();
+      console.log('About to call setupEventListeners');
       setupEventListeners();
+      console.log('Completed setupEventListeners');
       initFileSync();
       generateAppIcon();
       setupOrientationListener();
