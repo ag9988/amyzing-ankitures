@@ -729,6 +729,7 @@
   <div class="modal-overlay" id="menu-modal">
     <div class="menu-dropdown" id="menu-dropdown">
       <button class="menu-item" id="export-btn">📤 Export Data</button>
+      <button class="menu-item" id="export-ical-btn">📅 Export iCal (All Events)</button>
       <button class="menu-item" id="import-btn">📥 Import Data</button>
       <button class="menu-item" id="sync-btn">☁️ iCloud Sync</button>
       <button class="menu-item destructive" id="clear-btn">🗑️ Clear All</button>
@@ -780,11 +781,23 @@
     function init() {
       restoreSessionState();
       renderItems();
+      setupMenuButton();
       setupEventListeners();
       initFileSync();
       generateAppIcon();
       setupOrientationListener();
       updateSyncUI('checking');
+    }
+
+    function setupMenuButton() {
+      const menuBtn = document.getElementById('menu-btn');
+      const menuDropdown = document.getElementById('menu-dropdown');
+      if (menuBtn && menuDropdown) {
+        menuBtn.onclick = (e) => {
+          e.stopPropagation();
+          menuDropdown.classList.toggle('active');
+        };
+      }
     }
 
     // ===== PERSISTENCE =====
@@ -1082,6 +1095,51 @@ END:VCALENDAR`;
       URL.revokeObjectURL(url);
     }
 
+    function exportAllIcal() {
+      const itemsWithDates = items.filter(item => item.date);
+      if (itemsWithDates.length === 0) {
+        alert('No items with dates to export.');
+        return;
+      }
+
+      let icalContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Amyzing Ankitures//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH`;
+
+      itemsWithDates.forEach(item => {
+        const uid = `amyzing-${item.id}@ankitures.local`;
+        const dtstart = item.date.replace(/-/g, '');
+        let description = item.notes || '';
+        if (item.category) {
+          description = (description ? description + ' | ' : '') + `Category: ${item.category}`;
+        }
+
+        icalContent += `
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+DTSTART:${dtstart}${item.time ? 'T' + item.time.replace(':', '') + '00' : ''}
+SUMMARY:${item.name}
+DESCRIPTION:${description}
+LOCATION:Amyzing Ankitures
+STATUS:CONFIRMED
+END:VEVENT`;
+      });
+
+      icalContent += `
+END:VCALENDAR`;
+
+      const blob = new Blob([icalContent], { type: 'text/calendar' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `amyzing-ankitures-events-${new Date().toISOString().split('T')[0]}.ics`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
     function importData(event) {
       const file = event.target.files?.[0];
       if (!file) return;
@@ -1270,6 +1328,11 @@ END:VCALENDAR`;
       // Menu items
       document.getElementById('export-btn').addEventListener('click', () => {
         exportData();
+        menuDropdown.classList.remove('active');
+      });
+
+      document.getElementById('export-ical-btn').addEventListener('click', () => {
+        exportAllIcal();
         menuDropdown.classList.remove('active');
       });
 
